@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html>
+	<head> 
+		<link rel="stylesheet" href="style.css" />
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+		<title>Team Speak Enhanced.</title>
+		<script>
+			var slots = new Array();
+			var lastTalked;
+
+			function initialize()
+			{
+				
+			}
+			
+			function addSlot() 
+			{
+				var myId = "slot-" + slots.length;
+				var slot = document.createElement('div');
+				var slotFav = document.createElement('div');
+				var slotTalk = document.createElement('div');
+				var slotNick = document.createElement('div');
+				var slotNickSpan = document.createElement('span');
+		
+				slot.id = myId;
+				slot.className = "slot";
+				slot.position = slots.length;
+				slot.favorited = false;
+    
+				slotFav.className = "slot-fav";
+				slotFav.onclick = function() {
+					favorite(slot,slotFav);
+				};
+    
+				slotTalk.className = "slot-talk";
+				slotTalk.onclick = function() {
+				mute(slot,slotTalk);
+				};
+    
+				slotNick.className = "slot-nick";
+				slotNick.appendChild(slotNickSpan);
+				slotNickSpan.innerHTML = "My Pos " + slot.position;
+				slotNick.onclick = function () {
+					removeSlot(slot,slotNickSpan.innerHTML);
+				};
+    
+				slot.appendChild(slotFav);
+				slot.appendChild(slotTalk);
+				slot.appendChild(slotNick);
+    
+				slots.push(slot);
+				document.body.appendChild(slot);
+			}
+
+			function setLastTalked(nick,show) 
+			{
+   				lastTalked = document.getElementById("lastTalkedSlot");
+				lastTalked.innerHTML = "Last Talked: "+nick;
+				lastTalked.style.display = "inherit";
+			
+				var timeOut = setTimeout(function() {
+					var op = 1;
+					var timer = setInterval(function() {
+						
+						if (op <= 0.5){
+						clearInterval(timer);
+						}
+					
+						lastTalked.style.opacity = op;
+						lastTalked.style.filter = 'alpha(opacity=' + op * 100 + ")";
+						op -= 0.05;
+					}, 50);
+				},3000);
+				
+				lastTalked.onmouseover = function() {
+					lastTalked.style.opacity = 1;
+				}
+				
+				lastTalked.onmouseout = function() {
+					var op = 1;
+					var timer = setInterval(function() {
+						
+						if (op <= 0.5){
+						clearInterval(timer);
+						}
+					
+						lastTalked.style.opacity = op;
+						lastTalked.style.filter = 'alpha(opacity=' + op * 100 + ")";
+						op -= 0.05;
+					}, 50);
+				}
+			}
+			
+			function favorite(slot,slotFav) 
+			{
+    
+				if(!slot.favorited) 
+				{
+					slot.favorited = true;
+					slotFav.style.backgroundImage = "url('images/star-on.png')";
+				}
+				else 
+				{
+					slot.favorited = false;
+					slotFav.style.backgroundImage = "url('images/star-off.png')";
+				}
+			}		
+
+			function mute(slot,slotTalk) 
+			{
+    
+				if(!slot.muted) 
+				{
+					slot.muted = true;
+					slotTalk.style.backgroundImage= "url('images/talk-mute.png')";
+				}
+				else 
+				{
+					slot.muted = false;
+					slotTalk.style.backgroundImage = "url('images/talk-off.png')";
+				}
+			}
+
+			function removeSlot(slot,nick) 
+			{
+    
+				var op = 1
+				var timer = setInterval(function () {
+					if (op <= 0.05){
+						clearInterval(timer);
+						slot.style.display = "none";
+						setLastTalked(nick,true);
+					}
+					
+					slot.style.opacity = op;
+					slot.style.filter = 'alpha(opacity=' + op * 100 + ")";
+					op -= 0.05;
+				}, 50);
+				//slot.parentNode.removeChild(slot); jai palyvina kanala
+			}
+			
+			function resetAll() 
+			{
+				for (var i = 0; i < slots.length; i++) 
+				{
+					slots[i].style.display = "inherit";
+					slots[i].style.opacity = 1;
+				}
+			}
+		
+			function dragMove(){
+				overwolf.windows.getCurrentWindow(function(result){
+					if (result.status=="success"){
+						overwolf.windows.dragMove(result.window.id);
+					}
+				});
+			};
+			
+			function closeWindow(){
+				overwolf.windows.getCurrentWindow(function(result){
+					if (result.status=="success"){
+						overwolf.windows.close(result.window.id);
+					}
+				});
+			};
+		</script>
+	</head>
+
+	<body>
+		<div id="content" onmousedown="dragMove();">
+			<button onClick="addSlot()">Add</button>
+			<button onClick="resetAll()">Reset</button>
+			<button id="close" onclick="closeWindow();">Close</button>
+			<div id="lastTalkedSlot" class="last-talked-slot" style="display:none"/>
+		</div>
+	</body>
+</html>
